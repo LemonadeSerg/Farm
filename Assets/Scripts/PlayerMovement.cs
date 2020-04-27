@@ -17,19 +17,24 @@ public class PlayerMovement : MonoBehaviour
     {
         Normal,
         Rolling,
+        Pause,
     }
 
-    private State moveState = State.Normal;
+    public State moveState = State.Normal;
     // Update is called once per frame
-    void Update()
+
+
+
+    public void InputUpdate()
     {
-        //Input 
+        if (moveState != State.Pause) {
         Dir.x = Input.GetAxisRaw("Horizontal");
         Dir.y = Input.GetAxisRaw("Vertical");
         if (Input.GetButtonDown("Jump"))
             Dash();
         if (moveState == State.Rolling)
             Dashing();
+        }
     }
 
     /// <summary>
@@ -58,12 +63,14 @@ public class PlayerMovement : MonoBehaviour
             }
     }
     //Fixed Update not linked to framerate
-    void FixedUpdate()
+    public void PhysicsUpdate()
     {
         //Movements 
-        updateAnimationVariables();
-        movePlayer();
-        flipForDir();
+
+            updateAnimationVariables();
+            movePlayer();
+            flipForDir();
+        
     }
     /// <summary>
     ///Passes movement to Animator
@@ -87,6 +94,9 @@ public class PlayerMovement : MonoBehaviour
             case State.Rolling:
                 rb.velocity = (DashDir.normalized * dashSpeed * Time.fixedDeltaTime);
                 break;
+            case State.Pause:
+                rb.velocity = Vector2.zero;
+                break;
         }
     }
     /// <summary>
@@ -94,7 +104,7 @@ public class PlayerMovement : MonoBehaviour
     void flipForDir()
     {
         //Flip to side
-        if (Dir.x > 0)
+        if (Dir.x < 0)
             sprite.flipX = true;
         else
             sprite.flipX = false;
